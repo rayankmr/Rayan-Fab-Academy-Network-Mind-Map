@@ -1,0 +1,794 @@
+<!--  
+ Rayan Abdul Gafoor 07/07/2024
+
+ This work may be reproduced, modified, distributed,
+ performed, and displayed for any purpose, but must
+ acknowledge this project. Copyright is retained and
+ must be preserved. The work is provided as is; no
+ warranty is provided, and users accept all liability.
+ -->
+ 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rayan Abdul Gafoor - Fab Academy Mind Map</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    body, html {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .links line {
+      stroke: #666;
+      stroke-width: 2px;
+    }
+
+    .nodes circle {
+      stroke: #fff;
+      stroke-width: 1.5px;
+      cursor: pointer;
+    }
+
+    /* .tooltip {
+      position: absolute;
+      text-align: justify;
+      padding: 6px;
+      font: 15px sans-serif;
+      background: rgba(255, 255, 255, 0.995);
+      border: 0.5px solid gray;
+      border-radius: 6px;
+      pointer-events: none;
+    } */
+     
+        .tooltip {
+      position: absolute;
+      text-align: justify;
+      padding: 12px;
+      font-family: 'ia-writer-mono', monospace; /* Change to IA Writer Mono */
+      font-size: 15px;
+      background: rgba(255, 255, 255, 0.995);
+      border: 0.5px solid gray;
+      border-radius: 6px;
+      pointer-events: none;
+      line-height: 1.6; /* Increase gap between texts */
+}
+  /* 
+      .toolbar {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(255, 255, 255, 0.8);
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        
+      } */
+      .toolbar {
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #ffffff;
+      padding: 10px;
+      border: 1px solid #ccc;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+    button, select {
+  background-color: #e0e0e0; /* Change to desired initial color */
+  border: none;
+  padding: 10px 20px;
+  color: #333;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s; /* Smooth transition for hover effect */
+  
+}
+    button:hover{
+      background-color: #f74d4d; /* Change to desired hover color */
+      cursor: pointer; /* Change cursor to pointer on hover */
+    }
+    select:hover{
+      background-color: #ffffff; /* Change to desired hover color */
+      cursor: pointer; /* Change cursor to pointer on hover */
+    }
+        
+
+    .toolbar button, .toolbar select {
+      margin: 0 5px;
+      padding: 8px 20px;
+    
+    }
+    
+
+    .legend {
+      position: absolute;
+      bottom: 40px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font: 15px sans-serif;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+
+    .legend-color {
+      width: 20px;
+      height: 20px;
+      margin-right: 10px;
+    }
+    .view-counter {
+            position: fixed;
+            bottom: 40px;
+            left: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .wheel {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #3a8cff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .wheel:before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: conic-gradient(from -45deg, #FF5722 0%, #FFC107 50%, #FF5722 100%);
+            border-radius: 50%;
+            clip-path: polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%);
+            animation: rotate 5s linear infinite;
+        }
+
+        @keyframes rotate {
+            100% {
+                transform: rotate(1turn);
+            }
+        }
+
+        #view-count {
+            z-index: 2;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            font: 15px sans-serif;
+            color: gray;
+        }
+
+        .footer a {
+            color: gray;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+  </style>
+</head>
+<body>
+  <svg id="graph" width="100%" height="100%"></svg>
+  <div class="tooltip" id="tooltip" style="display: none;"></div>
+  <div class="toolbar">
+    <button id="zoom_in" >Zoom In</button>
+    <button id="zoom_out">Zoom Out</button>
+    <select id="filter">
+      <option value="all" >Show All</option>
+      <option value="Main">Main Page: Rayan Abdul Gafoor</option>
+      <option value="w1">Week 1: Project Management, Principles and Practices</option>
+      <option value="w2">Week 2: Computer-Aided Design</option>
+      <option value="w3">Week 3: Computer Controlled Cutting</option>
+      <option value="w4">Week 4: Electronics Production</option>
+      <option value="w5">Week 5: 3D Scanning and Printing</option>
+      <option value="w6">Week 6: Embedded Programming</option>
+      <option value="w7">Week 7: Computer-Controlled Machining</option>
+      <option value="w8">Week 8: Electronics Design</option>
+      <option value="w9">Week 9: Output Devices</option>
+      <option value="w10">Week 10: Mechanical & Machine Design</option>
+      <option value="w11">Week 11: Input Devices</option>
+      <option value="w12">Week 12: Molding And Casting</option>
+      <option value="w13">Week 13: Networking and Communications</option>
+      <option value="w14">Week 14: Interface And Application Programming</option>
+      <option value="w15">Week 15: Wildcard Week</option>
+      <option value="w16">Week 16: System Integration</option>
+      <option value="w17">Week 17: Applications and Implications</option>
+      <option value="w18">Week 18: Invention, Intellectual Property, and Income</option>
+      <option value="w19">Project Development</option>
+      <option value="FP">Final Project: Dream Sway</option>
+    </select>
+  </div>
+  <div class="legend" id="legend">
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #DF0066;"></div>
+      <span>MAIN PAGE</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #2ca02c;"></div>
+      <span>WEEKLY ASSIGNMENTS</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #FFA500;"></div>
+      <span>PROFESSIONAL HUBS</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #0098DF;"></div>
+      <span>REFERENCE</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #9900ff;"></div>
+      <span>FAB REFERENCE</span>
+    </div>
+  </div>
+  <div class="view-counter">
+    <div class="wheel" id="wheel">
+        <span id="view-count"></span>
+    </div>
+  </div>
+
+  <div class="footer">
+   Created by <a href="https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/" target="_blank" style="color: #fa5353;">Rayan Abdul Gafoor</a>
+  </div>
+
+  <script>
+    let nodes = [
+    { id: "Rayan Abdul Gafoor", url: "https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/", targetCount: 6, radius: 12, color: "#DF0066", details: "Year: 2024 <br>Node: Kochi" },
+      { id: "Week 1", url: "https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/week01.html", targetCount: 2.11, targetCountss: 2.1, radius: 10, color: "#2ca02c", details: "Project Management, Principles and Practices" },
+      { id: "Week 2", url: "https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/week02.html", targetCount: 2.21, radius: 15, color: "#2ca02c", details: "Computer-Aided Design" },
+      { id: "Week 3", url: "https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/week03.html", targetCount: 2.31, radius: 15, color: "#2ca02c", details: "Computer Controlled Cutting" },
+      { id: "Week 4", url: "https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/week04.html", targetCount: 2.41, radius: 15, color: "#2ca02c", details: "Electronics Production" },
+      { id: "Week 5", url: "https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/week05.html", targetCount: 2.51, radius: 15, color: "#2ca02c", details: "3D Scanning and Printing" },
+      { id: "Week 6", url: "https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/week06.html", targetCount: 2.61, radius: 15, color: "#2ca02c", details: "Embedded Programming" },
+      { id: "Week 7", url: "https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/week07.html", targetCount: 2.71, radius: 15, color: "#2ca02c", details: "Computer-Controlled Machining" },
+      { id: "Week 8", url: "https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/week08.html", targetCount: 2.81, radius: 15, color: "#2ca02c", details: "Electronics Design" },
+      { id: "Week 9", url: "https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/week09.html", targetCount: 2.91, radius: 15, color: "#2ca02c", details: "Output Devices" },
+      { id: "Week 10", url: "https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/week10.html", targetCount: 2.101, radius: 15, color: "#2ca02c", details: "Mechanical & Machine Design" },
+      { id: "Week 11", url: "https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/week11.html", targetCount: 2.111, radius: 15, color: "#2ca02c", details: "Input Devices" },
+      { id: "Week 12", url: "https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/week12.html", targetCount: 2.121, radius: 15, color: "#2ca02c", details: "Molding And Casting" },
+      { id: "Week 13", url: "https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/week13.html", targetCount: 2.131, radius: 15, color: "#2ca02c", details: "Networking and Communications" },
+      { id: "Week 14", url: "https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/week14.html", targetCount: 2.141, radius: 15, color: "#2ca02c", details: "Interface And Application Programming" },
+      { id: "Week 15", url: "https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/week15.html", targetCount: 2.151, radius: 15, color: "#2ca02c", details: "Wildcard Week" },
+      { id: "Week 16", url: "https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/week16.html", targetCount: 2.161, radius: 15, color: "#2ca02c", details: "System Integration" },
+      { id: "Week 17", url: "https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/week17.html", targetCount: 2.171, radius: 15, color: "#2ca02c", details: "Applications and Implications" },
+      { id: "Week 18", url: "https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/week18.html", targetCount: 2.181, radius: 15, color: "#2ca02c", details: "Invention, Intellectual Property, and Income" },
+      { id: "Project Development", url: "https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/week19.html", targetCount: 2.191, radius: 15, color: "#2ca02c", details: "" },
+      { id: "Final Project", url: "https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/final.html", targetCount: 2.201, radius: 15, color: "#2ca02c", details: "" },
+      { id: "LinkedIn", url: "https://www.linkedin.com/in/rayan313/", targetCount: 2, radius: 15, color: "#FFA500", details: "" },
+      { id: "GitHub", url: "https://github.com/rayankmr", targetCount: 2, radius: 15, color: "#FFA500", details: "" },
+      { id: "ORCID", url: "https://orcid.org/0000-0002-1383-4210", targetCount: 2, radius: 15, color: "#FFA500", details: "" },
+      { id: "Git", url: "https://learngitbranching.js.org/", targetCount: 2.11, radius: 15, color: "#0098DF", details: "" },
+      { id: "W3school", url: "https://www.w3schools.com/", targetCount: 2.11, radius: 15, color: "#0098DF", details: "" },
+      { id: "Photopea", url: "https://www.photopea.com/", targetCount: 2.21, radius: 15, color: "#0098DF", details: "" },
+      { id: "Gimp", url: "https://www.gimp.org/", targetCount: 2.21, radius: 15, color: "#0098DF", details: "" },
+      { id: "Inkscape", url: "https://inkscape.org/release/inkscape-1.3.2/", targetCount: 2.21, radius: 15, color: "#0098DF", details: "" },
+      { id: "Illustrator", url: "https://www.adobe.com/in/products/illustrator/free-trial-download.html", targetCount: 2.21, radius: 15, color: "#0098DF", details: "" },
+      { id: "Blender", url: "https://www.blender.org/download/", targetCount: 2.21, radius: 15, color: "#0098DF", details: "" },
+      { id: "Handbrake", url: "https://handbrake.fr/", targetCount: 2.21, radius: 15, color: "#0098DF", details: "" },
+      { id: "Zeeconvert", url: "https://zeeconvert.com/compress-jpg/reduce-image-size-in-kb.php", targetCount: 2.21, radius: 15, color: "#0098DF", details: "" },
+      { id: "Powertoys", url: "https://learn.microsoft.com/en-us/windows/powertoys/install", targetCount: 2.21, radius: 15, color: "#0098DF", details: "" },
+      { id: "Nadieh Bremer", url: "https://fabacademy.org/2021/labs/waag/students/nadieh-bremer/", targetCount: 2.31, radius: 15, color: "#9900ff", details: "" },
+      { id: "Abdon", url: "https://fabacademy.org/2019/labs/tecsup/students/abdon-rotela/", targetCount: 2.31, radius: 15, color: "#9900ff", details: "" },
+      { id: "Week 3 Group Work", url: "https://fabacademy.org/2024/labs/kochi/Group_Assignments/week3/", targetCount: 2.31, radius: 15, color: "#9900ff", details: "" },
+      { id: "Week 4 Group Work", url: "https://fabacademy.org/2024/labs/kochi/Group_Assignments/week4/", targetCount: 2.41, radius: 15, color: "#9900ff", details: "" },
+      { id: "Arduino", url: "https://www.arduino.cc/en/software/", targetCount: 2.41, radius: 15, color: "#0098DF", details: "" },
+      { id: "ATtiny412", url: "https://gitlab.fabcloud.org/pub/programmers/hello-attiny412", targetCount: 2.41, radius: 15, color: "#0098DF", details: "" },
+      { id: "3D Printing", url: "https://www.hubs.com/guides/3d-printing/", targetCount: 2.51, radius: 15, color: "#0098DF", details: "" },
+      { id: "3D Printer", url: "https://all3dp.com/1/types-of-3d-printers-3d-printing-technology/#section-material-extrusion", targetCount: 2.51, radius: 15, color: "#0098DF", details: "" },
+      { id: "Prusa Slicer", url: "https://help.prusa3d.com/article/first-print-with-prusaslicer_1753", targetCount: 2.51, radius: 15, color: "#0098DF", details: "" },
+      { id: "Switch Debounce", url: "https://www.geeksforgeeks.org/switch-debounce-in-digital-circuits/", targetCount: 2.61, radius: 15, color: "#0098DF", details: "" },
+      { id: "Thonny", url: "https://thonny.org/", targetCount: 2.61, radius: 15, color: "#0098DF", details: "" },
+      { id: "MicroPython", url: "https://realpython.com/micropython/", targetCount: 2.61, radius: 15, color: "#0098DF", details: "" },
+      { id: "MicroPython XIAO", url: "https://wiki.seeedstudio.com/XIAO-RP2040-with-MicroPython/", targetCount: 2.61, radius: 15, color: "#0098DF", details: "" },
+      { id: "CircuitPython", url: "https://learn.adafruit.com/welcome-to-circuitpython/circuitpython-essentials", targetCount: 2.61, radius: 15, color: "#0098DF", details: "" },
+      { id: "CircuitPython XIAO", url: "https://wiki.seeedstudio.com/XIAO-RP2040-with-CircuitPython/", targetCount: 2.61, radius: 15, color: "#0098DF", details: "" },
+      { id: "IR Sensor", url: "https://robu.in/ir-sensor-working/", targetCount: 2.61, radius: 15, color: "#0098DF", details: "" },
+      { id: "Week 5 Group Work", url: "https://fabacademy.org/2024/labs/kochi/Group_Assignments/week5/", targetCount: 2.51, radius: 15, color: "#9900ff", details: "" },
+      { id: "Week 6 Group Work", url: "https://fabacademy.org/2024/labs/kochi/Group_Assignments/week6/", targetCount: 2.61, radius: 15, color: "#9900ff", details: "" },
+      { id: "Sibin KS", url: "https://fabacademy.org/2023/labs/kochi/students/sibin-ks/", targetCount: 2.61, radius: 15, color: "#9900ff", details: "" },
+      { id: "Week 7 Group Work", url: "https://fabacademy.org/2024/labs/kochi/Group_Assignments/week7/", targetCount: 2.71, radius: 15, color: "#9900ff", details: "" },
+      { id: "Slicer for Fusion 360", url: "https://www.autodesk.com/support/technical/article/caas/tsarticles/ts/3yg7zznS94MHNDG7KMV8Qg.html", targetCount: 2.71, radius: 15, color: "#0098DF", details: "" },
+      { id: "Drill vs Mill", url: "https://www.harveyperformance.com/in-the-loupe/drill-mills-drill-vs-mill/", targetCount: 2.71, radius: 15, color: "#0098DF", details: "" },
+      { id: "CNC Flutes", url: "https://www.cs.cmu.edu/~rapidproto/students.03/zdb/project2/CNCflutes.htm", targetCount: 2.71, radius: 15, color: "#0098DF", details: "" },
+      { id: "Pallab Shrestha", url: "https://fabacademy.org/2021/labs/kochi/students/pallab-shrestha/index.html", targetCount: 2.71, radius: 15, color: "#9900ff", details: "" },
+      { id: "Week 8 Group Work", url: "https://fabacademy.org/2024/labs/kochi/Group_Assignments/week8/", targetCount: 2.81, radius: 15, color: "#9900ff", details: "" },
+      { id: "Resistor Calculator", url: "https://www.calculator.net/resistor-calculator.html", targetCount: 2.81, radius: 15, color: "#0098DF", details: "" },
+      { id: "Gerber 2 PNG", url: "https://gerber2png.fablabkerala.in/", targetCount: 2.81, radius: 15, color: "#0098DF", details: "" },
+      { id: "Fab Inventory", url: "https://inventory.fablabkerala.in/", targetCount: 2.81, radius: 15, color: "#0098DF", details: "" },
+      { id: "Quentorres", url: "https://gitlab.fabcloud.org/pub/programmers/quentorres/-/tree/main?ref_type=heads", targetCount: 2.81, radius: 15, color: "#9900ff", details: "" },
+      { id: "Tinkercad", url: "https://www.tinkercad.com/dashboard?type=circuits&collection=designs", targetCount: 2.81, radius: 15, color: "#0098DF", details: "" },
+      { id: "Wokwi", url: "https://wokwi.com/", targetCount: 2.81, radius: 15, color: "#0098DF", details: "" },
+      { id: "Servo Motor Basics", url: "https://circuitdigest.com/article/servo-motor-working-and-basics", targetCount: 2.91, radius: 15, color: "#0098DF", details: "" },
+      { id: "Servo Motor Torque", url: "https://automaticaddison.com/how-to-determine-what-torque-you-need-for-your-servo-motors/", targetCount: 2.91, radius: 15, color: "#0098DF", details: "" },
+      { id: "Nema17 Stepper Motor", url: "https://robocraze.com/blogs/post/nema-17-the-high-torque-stepper-motor-working-principle", targetCount: 2.91, radius: 15, color: "#0098DF", details: "" },
+      { id: "DRV8825 Driver", url: "https://www.makerguides.com/drv8825-stepper-motor-driver-arduino-tutorial/", targetCount: 2.91, radius: 15, color: "#0098DF", details: "" },
+      { id: "PCB Trace Width Calculator", url: "https://www.pcbway.com/pcb_prototype/trace-width-calculator.html", targetCount: 2.91, radius: 15, color: "#0098DF", details: "" },
+      { id: "Week 9 Group Work", url: "https://fabacademy.org/2024/labs/kochi/Group_Assignments/week9/", targetCount: 2.91, radius: 15, color: "#9900ff", details: "" },
+      { id: "Cakerator", url: "https://fabacademy.org/2024/labs/kochi/machine_week/Cakerator/", targetCount: 2.101, radius: 15, color: "#0098DF", details: "" },
+      { id: "Miro", url: "https://miro.com/signup/", targetCount: 2.101, radius: 15, color: "#0098DF", details: "" },
+      { id: "Spur Gears", url: "https://www.automotioncomponents.co.uk/en/pageid/automotion-spur-gears", targetCount: 2.101, radius: 15, color: "#0098DF", details: "" },
+      { id: "Gear Ratio", url: "https://www.wikihow.com/Determine-Gear-Ratio", targetCount: 2.101, radius: 15, color: "#0098DF", details: "" },
+      { id: "Spur Gear Generator", url: "https://evolventdesign.com/pages/spur-gear-generator", targetCount: 2.101, radius: 15, color: "#0098DF", details: "" },
+      { id: "Quentin Bolsee", url: "https://fabacademy.org/2020/labs/ulb/students/quentin-bolsee/projects/final-project/3-development/", targetCount: 2.101, radius: 15, color: "#9900ff", details: "" },
+      { id: "Diar Amin", url: "https://fabacademy.org/2019/labs/barcelona/students/diar-amin/week15/week15.html", targetCount: 2.101, radius: 15, color: "#9900ff", details: "" },
+      { id: "Step Response", url: "https://en.wikipedia.org/wiki/Step_response", targetCount: 2.111, radius: 15, color: "#0098DF", details: "" },
+      { id: "Week 11 Lecture", url: "https://vimeo.com/933093724", targetCount: 2.111, radius: 15, color: "#9900ff", details: "" },
+      { id: "Week 11 Group Work", url: "https://fabacademy.org/2024/labs/kochi/Group_Assignments/week11/", targetCount: 2.111, radius: 15, color: "#9900ff", details: "" },
+      { id: "Capacitive Multi-Touch", url: "https://fab.cba.mit.edu/classes/863.11/people/matthew.keeter/multitouch/index.html", targetCount: 2.111, radius: 15, color: "#9900ff", details: "" },
+      { id: "Capacitive Touchpad", url: "https://fab.cba.mit.edu/classes/863.10/people/matt.blackshaw/week8.html", targetCount: 2.111, radius: 15, color: "#9900ff", details: "" },
+      { id: "Week 12 Group Work", url: "https://fabacademy.org/2024/labs/kochi/Group_Assignments/week12/", targetCount: 2.111, radius: 15, color: "#9900ff", details: "" },
+      { id: "Molding Basics", url: "https://www.3erp.com/blog/molding/", targetCount: 2.121, radius: 15, color: "#0098DF", details: "" },
+      { id: "CAM", url: "https://www.autodesk.com/products/fusion-360/blog/computer-aided-manufacturing-beginners/", targetCount: 2.121, radius: 15, color: "#0098DF", details: "" },
+      { id: "TRAK DPM RX2", url: "https://www.southwesternindustries.com/products/dpmrx-bed-mills/dpm-rx2-bed-mill", targetCount: 2.121, radius: 15, color: "#0098DF", details: "" },
+      { id: "Ratio Calculator", url: "https://www.calculatorsoup.com/calculators/math/ratios.php", targetCount: 2.121, radius: 15, color: "#0098DF", details: "" },
+      { id: "UART Communication", url: "https://www.circuitbasics.com/basics-uart-communication/", targetCount: 2.131, radius: 15, color: "#0098DF", details: "" },
+      { id: "Week 13 Group Work", url: "https://fabacademy.org/2024/labs/kochi/Group_Assignments/Week13/", targetCount: 2.131, radius: 15, color: "#9900ff", details: "" },
+      { id: "Web Serial API", url: "https://developer.chrome.com/docs/capabilities/serial", targetCount: 2.141, radius: 15, color: "#0098DF", details: "" },
+      { id: "Week 14 Group Work", url: "https://fabacademy.org/2024/labs/kochi/Group_Assignments/week14/", targetCount: 2.141, radius: 15, color: "#9900ff", details: "" },
+      { id: "Soft Robotics", url: "https://adrianacabrera.github.io/SoftRobotics/", targetCount: 2.151, radius: 15, color: "#0098DF", details: "" },
+      { id: "Soft Robotics 2", url: "https://gmwgroup.harvard.edu/soft-robotics", targetCount: 2.151, radius: 15, color: "#0098DF", details: "" },
+      
+      { id: "IP India", url: "https://ipindia.gov.in/", targetCount: 2.181, radius: 15, color: "#0098DF", details: "" },
+      { id: "Patent Filing Steps", url: "https://brainiac.co.in/a-step-by-step-guide-to-filing-a-patent-in-india/", targetCount: 2.181, radius: 15, color: "#0098DF", details: "" },
+      { id: "Open Source Licenses", url: "https://opensource.org/licenses", targetCount: 2.181, radius: 15, color: "#0098DF", details: "" },
+      { id: "General Public License", url: "https://www.gnu.org/licenses/gpl-3.0.en.html", targetCount: 2.181, radius: 15, color: "#0098DF", details: "" },
+      { id: "Apache License", url: "https://www.apache.org/licenses/LICENSE-2.0", targetCount: 2.181, radius: 15, color: "#0098DF", details: "" },
+      { id: "Creative Commons", url: "https://creativecommons.org/", targetCount: 2.181, radius: 15, color: "#0098DF", details: "" },
+      { id: "BY-NC-SA", url: "https://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1", targetCount: 2.181, radius: 15, color: "#0098DF", details: "" },
+
+    ];
+
+    let links = [
+      { source: "Week 1", target: "Rayan Abdul Gafoor" },
+      { source: "Week 2", target: "Rayan Abdul Gafoor" },
+      { source: "Week 3", target: "Rayan Abdul Gafoor" },
+      { source: "Week 4", target: "Rayan Abdul Gafoor" },
+      { source: "Week 5", target: "Rayan Abdul Gafoor" },
+      { source: "Week 6", target: "Rayan Abdul Gafoor" },
+      { source: "Week 7", target: "Rayan Abdul Gafoor" },
+      { source: "Week 8", target: "Rayan Abdul Gafoor" },
+      { source: "Week 9", target: "Rayan Abdul Gafoor" },
+      { source: "Week 10", target: "Rayan Abdul Gafoor" },
+      { source: "Week 11", target: "Rayan Abdul Gafoor" },
+      { source: "Week 12", target: "Rayan Abdul Gafoor" },
+      { source: "Week 13", target: "Rayan Abdul Gafoor" },
+      { source: "Week 14", target: "Rayan Abdul Gafoor" },
+      { source: "Week 15", target: "Rayan Abdul Gafoor" },
+      { source: "Week 16", target: "Rayan Abdul Gafoor" },
+      { source: "Week 17", target: "Rayan Abdul Gafoor" },
+      { source: "Week 18", target: "Rayan Abdul Gafoor" },
+      { source: "Project Development", target: "Rayan Abdul Gafoor" },
+      { source: "Final Project", target: "Rayan Abdul Gafoor" },
+      { source: "LinkedIn", target: "Rayan Abdul Gafoor" },
+      { source: "GitHub", target: "Rayan Abdul Gafoor" },
+      { source: "ORCID", target: "Rayan Abdul Gafoor" },
+      
+
+      { source: "Week 1", target: "Git" },
+      { source: "Week 1", target: "W3school" },
+      { source: "Week 2", target: "Photopea" },
+      { source: "Week 2", target: "Gimp" },
+      { source: "Week 2", target: "Inkscape" },
+      { source: "Week 2", target: "Illustrator" },
+      { source: "Week 2", target: "Blender" },
+      { source: "Week 2", target: "Handbrake" },
+      { source: "Week 2", target: "Zeeconvert" },
+      { source: "Week 2", target: "Powertoys" },
+      { source: "Week 3", target: "Nadieh Bremer" }, 
+      { source: "Week 3", target: "Abdon" },
+      { source: "Week 3", target: "Week 3 Group Work" },
+      { source: "Week 4", target: "Week 4 Group Work" },
+      { source: "Week 4", target: "Arduino" },
+      { source: "Week 4", target: "ATtiny412" },
+      { source: "Week 5", target: "3D Printing" },
+      { source: "Week 5", target: "3D Printer" },
+      { source: "Week 5", target: "Week 5 Group Work" },
+      { source: "Week 5", target: "Prusa Slicer" },
+      { source: "Week 6", target: "Switch Debounce" },
+      { source: "Week 6", target: "Thonny" },
+      { source: "Week 6", target: "MicroPython" },
+      { source: "Week 6", target: "MicroPython XIAO" },
+      { source: "Week 6", target: "CircuitPython" },
+      { source: "Week 6", target: "CircuitPython XIAO" },
+      { source: "Week 6", target: "IR Sensor" },
+      { source: "Week 6", target: "Week 6 Group Work" },
+      { source: "Week 6", target: "Sibin KS" },
+      { source: "Week 7", target: "Week 7 Group Work" },
+      { source: "Week 7", target: "Slicer for Fusion 360" },
+      { source: "Week 7", target: "Drill vs Mill" },
+      { source: "Week 7", target: "CNC Flutes" },
+      { source: "Week 7", target: "Pallab Shrestha" },
+      { source: "Week 8", target: "Week 8 Group Work" },
+      { source: "Week 8", target: "Resistor Calculator" },
+      { source: "Week 8", target: "Gerber 2 PNG" },
+      { source: "Week 8", target: "Fab Inventory" },
+      { source: "Week 8", target: "Quentorres" },
+      { source: "Week 8", target: "Tinkercad" },
+      { source: "Week 8", target: "Wokwi" },
+      { source: "Week 9", target: "Servo Motor Basics" },
+      { source: "Week 9", target: "Servo Motor Torque" },
+      { source: "Week 9", target: "Nema17 Stepper Motor" },
+      { source: "Week 9", target: "DRV8825 Driver" },
+      { source: "Week 9", target: "PCB Trace Width Calculator" },
+      { source: "Week 9", target: "Week 9 Group Work" },
+      { source: "Week 10", target: "Cakerator" },
+      { source: "Week 10", target: "Miro" },
+      { source: "Week 10", target: "Spur Gears" },
+      { source: "Week 10", target: "Gear Ratio" },
+      { source: "Week 10", target: "Spur Gear Generator" },
+      { source: "Week 10", target: "Quentin Bolsee" },
+      { source: "Week 10", target: "Diar Amin" },
+      { source: "Week 11", target: "Step Response" },
+      { source: "Week 11", target: "Week 11 Lecture" },
+      { source: "Week 11", target: "Week 11 Group Work" },
+      { source: "Week 11", target: "Capacitive Multi-Touch" },
+      { source: "Week 11", target: "Capacitive Touchpad" },
+      { source: "Week 11", target: "Week 12 Group Work" },
+      { source: "Week 12", target: "Molding Basics" },
+      { source: "Week 12", target: "CAM" },
+      { source: "Week 12", target: "TRAK DPM RX2" },
+      { source: "Week 12", target: "Ratio Calculator" },
+      { source: "Week 13", target: "UART Communication" },
+      { source: "Week 13", target: "Week 13 Group Work" },
+      { source: "Week 14", target: "Web Serial API" },
+      { source: "Week 14", target: "Week 14 Group Work" },
+      { source: "Week 15", target: "Soft Robotics" },
+      { source: "Week 15", target: "Soft Robotics 2" },
+      { source: "Week 18", target: "IP India" },
+      { source: "Week 18", target: "Patent Filing Steps" },
+      { source: "Week 18", target: "Open Source Licenses" },
+      { source: "Week 18", target: "General Public License" },
+      { source: "Week 18", target: "Apache License" },
+      { source: "Week 18", target: "Creative Commons" },
+      { source: "Week 18", target: "BY-NC-SA" },
+      
+    //   { source: "Final Project", target: "Week 7" },
+    //   { source: "Final Project", target: "Week 16" },
+    //   { source: "Final Project", target: "Week 17" },
+    //   { source: "Final Project", target: "Week 18" },
+    ];
+
+    const nodeSizeScale = d3.scaleLinear()
+      .domain([0, d3.max(nodes, d => d.targetCount)])
+      .range([5, 20]);
+
+    nodes.forEach(node => {
+      node.radius = nodeSizeScale(node.targetCount);
+    });
+
+    const svg = d3.select("#graph");
+    const g = svg.append("g");
+
+    const zoom = d3.zoom()
+      .scaleExtent([0.5, 4])
+      .on("zoom", (event) => {
+        g.attr("transform", event.transform);
+      });
+
+    svg.call(zoom);
+
+     // Set initial zoom to 80% and center the graph
+     const initialZoomScale = 0.7;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const initialTransform = d3.zoomIdentity
+      .translate(width / 2, height / 2)
+      .scale(initialZoomScale)
+      .translate(-width / 2, -height / 2);
+    svg.call(zoom.transform, initialTransform);
+
+    const updateGraph = (filteredNodes) => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+
+      svg.attr("width", width).attr("height", height);
+
+      const filteredLinks = links.filter(link => {
+        return filteredNodes.some(node => node.id === link.source) && filteredNodes.some(node => node.id === link.target);
+      });
+
+      const simulation = d3.forceSimulation(nodes)
+        .force("link", d3.forceLink(links).id(d => d.id))
+        .force("charge", d3.forceManyBody().strength(-200))
+        .force("center", d3.forceCenter(width / 2, height / 2));
+
+      g.selectAll("*").remove();
+
+      const link = g.append("g")
+        .attr("class", "links")
+        .selectAll("line")
+        .data(links)
+        .enter().append("line")
+        .attr("stroke", d => filteredLinks.includes(d) ? "#666" : "#ddd")
+        .attr("stroke-width", d => filteredLinks.includes(d) ? 2 : 1);
+
+      const node = g.append("g")
+        .attr("class", "nodes")
+        .selectAll("circle")
+        .data(nodes)
+        .enter().append("circle")
+        .attr("r", d => d.radius)
+        .attr("fill", d => d.color)
+        .attr("opacity", d => filteredNodes.includes(d) ? 1 : 0.3)
+        .on("click", (event, d) => {
+          window.open(d.url, "_blank");
+        })
+        .on("mouseover", (event, d) => {
+          const tooltip = document.getElementById('tooltip');
+          tooltip.innerHTML = `<strong>${d.id}</strong><br>${d.details}`;
+          tooltip.style.left = (event.pageX + 10) + 'px';
+          tooltip.style.top = (event.pageY - 20) + 'px';
+          tooltip.style.display = 'block';
+        })
+        .on("mousemove", (event) => {
+          const tooltip = document.getElementById('tooltip');
+          tooltip.style.left = (event.pageX + 10) + 'px';
+          tooltip.style.top = (event.pageY - 20) + 'px';
+        })
+        .on("mouseout", () => {
+          const tooltip = document.getElementById('tooltip');
+          tooltip.style.display = 'none';
+        })
+        .call(d3.drag()
+          .on("start", dragstarted)
+          .on("drag", dragged)
+          .on("end", dragended));
+
+      simulation.on("tick", () => {
+        link
+          .attr("x1", d => d.source.x)
+          .attr("y1", d => d.source.y)
+          .attr("x2", d => d.target.x)
+          .attr("y2", d => d.target.y);
+
+        node
+          .attr("cx", d => d.x)
+          .attr("cy", d => d.y);
+      });
+
+      function dragstarted(event, d) {
+        if (!event.active) simulation.alphaTarget(0.3).restart();
+        d.fx = d.x;
+        d.fy = d.y;
+      }
+
+      function dragged(event, d) {
+        d.fx = event.x;
+        d.fy = event.y;
+      }
+
+      function dragended(event, d) {
+        if (!event.active) simulation.alphaTarget(0);
+        d.fx = null;
+        d.fy = null;
+      }
+    };
+
+    updateGraph(nodes);
+
+    window.addEventListener('resize', () => updateGraph(nodes));
+
+    document.getElementById('zoom_in').addEventListener('click', () => {
+      svg.transition().call(zoom.scaleBy, 1.2);
+    });
+
+    document.getElementById('zoom_out').addEventListener('click', () => {
+      svg.transition().call(zoom.scaleBy, 0.8);
+    });
+
+    document.getElementById('filter').addEventListener('change', (event) => {
+      const filterValue = event.target.value;
+      let filteredNodes;
+      if (filterValue === 'all') {
+        filteredNodes = nodes;
+      } 
+      else if (filterValue === 'Main') {
+        const threshold = 'Rayan Abdul Gafoor';
+        filteredNodes = nodes.filter(node => node.id == threshold);
+      }
+      else if (filterValue === 'w1') {
+        const threshold =2.11;
+        const threshold2 =6;
+        // console.log(threshold );
+        filteredNodes = nodes.filter(node => node.targetCount == threshold || node.targetCount == threshold2 );
+      }
+      else if (filterValue === 'w2') {
+        const threshold =2.21;
+        const threshold2 =6;
+        // console.log(threshold );
+        filteredNodes = nodes.filter(node => node.targetCount == threshold || node.targetCount == threshold2 );
+      }
+      else if (filterValue === 'w3') {
+        const threshold =2.31;
+        const threshold2 =6;
+        // console.log(threshold );
+        filteredNodes = nodes.filter(node => node.targetCount == threshold || node.targetCount == threshold2 );
+      }
+      else if (filterValue === 'w4') {
+        const threshold =2.41;
+        const threshold2 =6;
+        // console.log(threshold );
+        filteredNodes = nodes.filter(node => node.targetCount == threshold || node.targetCount == threshold2 );
+      }
+      else if (filterValue === 'w5') {
+        const threshold =2.51;
+        const threshold2 =6;
+        // console.log(threshold );
+        filteredNodes = nodes.filter(node => node.targetCount == threshold || node.targetCount == threshold2 );
+      }
+      else if (filterValue === 'w6') {
+        const threshold =2.61;
+        const threshold2 =6;
+        // console.log(threshold );
+        filteredNodes = nodes.filter(node => node.targetCount == threshold || node.targetCount == threshold2 );
+      }
+      else if (filterValue === 'w7') {
+        const threshold =2.71;
+        const threshold2 =6;
+        // console.log(threshold );
+        filteredNodes = nodes.filter(node => node.targetCount == threshold || node.targetCount == threshold2 );
+      }
+      else if (filterValue === 'w8') {
+        const threshold =2.81;
+        const threshold2 =6;
+        // console.log(threshold );
+        filteredNodes = nodes.filter(node => node.targetCount == threshold || node.targetCount == threshold2 );
+      }
+      else if (filterValue === 'w9') {
+        const threshold =2.91;
+        const threshold2 =6;
+        // console.log(threshold );
+        filteredNodes = nodes.filter(node => node.targetCount == threshold || node.targetCount == threshold2 );
+      }
+      else if (filterValue === 'w10') {
+        const threshold =2.101;
+        const threshold2 =6;
+        // console.log(threshold );
+        filteredNodes = nodes.filter(node => node.targetCount == threshold || node.targetCount == threshold2 );
+      }
+      else if (filterValue === 'w11') {
+        const threshold =2.111;
+        const threshold2 =6;
+        // console.log(threshold );
+        filteredNodes = nodes.filter(node => node.targetCount == threshold || node.targetCount == threshold2 );
+      }
+      else if (filterValue === 'w12') {
+        const threshold =2.121;
+        const threshold2 =6;
+        // console.log(threshold );
+        filteredNodes = nodes.filter(node => node.targetCount == threshold || node.targetCount == threshold2 );
+      }
+      else if (filterValue === 'w13') {
+        const threshold =2.131;
+        const threshold2 =6;
+        // console.log(threshold );
+        filteredNodes = nodes.filter(node => node.targetCount == threshold || node.targetCount == threshold2 );
+      }
+      else if (filterValue === 'w14') {
+        const threshold =2.141;
+        const threshold2 =6;
+        // console.log(threshold );
+        filteredNodes = nodes.filter(node => node.targetCount == threshold || node.targetCount == threshold2 );
+      }
+      else if (filterValue === 'w15') {
+        const threshold =2.151;
+        const threshold2 =6;
+        // console.log(threshold );
+        filteredNodes = nodes.filter(node => node.targetCount == threshold || node.targetCount == threshold2 );
+      }
+      else if (filterValue === 'w16') {
+        const threshold =2.161;
+        const threshold2 =6;
+        // console.log(threshold );
+        filteredNodes = nodes.filter(node => node.targetCount == threshold || node.targetCount == threshold2 );
+      }
+      else if (filterValue === 'w17') {
+        const threshold =2.171;
+        const threshold2 =6;
+        // console.log(threshold );
+        filteredNodes = nodes.filter(node => node.targetCount == threshold || node.targetCount == threshold2 );
+      }
+      else if (filterValue === 'w18') {
+        const threshold =2.181;
+        const threshold2 =6;
+        // console.log(threshold );
+        filteredNodes = nodes.filter(node => node.targetCount == threshold || node.targetCount == threshold2 );
+      }
+      else if (filterValue === 'w19') {
+        const threshold =2.191;
+        const threshold2 =6;
+        // console.log(threshold );
+        filteredNodes = nodes.filter(node => node.targetCount == threshold || node.targetCount == threshold2 );
+      }
+      else if (filterValue === 'FP') {
+        const threshold =2.201;
+        const threshold2 =6;
+        // console.log(threshold );
+        filteredNodes = nodes.filter(node => node.targetCount == threshold || node.targetCount == threshold2 );
+      }
+
+      else {
+        const threshold = +filterValue;
+        // console.log(threshold );
+        filteredNodes = nodes.filter(node => node.targetCount >= threshold);
+      }
+      updateGraph(filteredNodes);
+    });
+
+    // Handle panning with middle mouse button
+    let isPanning = false;
+    let panStart = { x: 0, y: 0 };
+
+    svg.on("mousedown", (event) => {
+      if (event.button === 1) { // Middle mouse button
+        isPanning = true;
+        panStart = { x: event.x, y: event.y };
+        event.preventDefault();
+      }
+    });
+
+    svg.on("mousemove", (event) => {
+      if (isPanning) {
+        const dx = event.x - panStart.x;
+        const dy = event.y - panStart.y;
+        svg.call(zoom.translateBy, dx, dy);
+        panStart = { x: event.x, y: event.y };
+      }
+    });
+
+    svg.on("mouseup", () => {
+      isPanning = false;
+    });
+
+    svg.on("mouseleave", () => {
+      isPanning = false;
+    });
+
+
+    // counter wheel
+    document.addEventListener('DOMContentLoaded', () => {
+            // Get the view count from localStorage
+            let viewCount = localStorage.getItem('viewCount');
+
+            // If there's no view count yet, initialize it to 0
+            if (!viewCount) {
+                viewCount = 0;
+            }
+
+            // Increment the view count
+            viewCount++;
+
+            // Update localStorage with the new view count
+            localStorage.setItem('viewCount', viewCount);
+
+            // Update the view count display
+            const viewCountElement = document.getElementById('view-count');
+            viewCountElement.textContent = viewCount;
+        });
+  </script>
+</body>
+</html>
