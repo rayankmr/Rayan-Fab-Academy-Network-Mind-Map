@@ -78,6 +78,28 @@
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
       z-index: 1000;
     }
+    .toolbar1 {
+      position: fixed;
+      top: 10px;
+      left: 23.5%;
+      transform: translateX(-50%);
+      background-color: #ffffff;
+      padding: 10px;
+      border: 1px solid #ccc;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+    .toolbar2 {
+      position: fixed;
+      top: 10px;
+      left: 77.5%;
+      transform: translateX(-50%);
+      background-color: #ffffff;
+      padding: 10px;
+      border: 1px solid #ccc;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
     button, select {
   background-color: #e0e0e0; /* Change to desired initial color */
   border: none;
@@ -99,6 +121,16 @@
         
 
     .toolbar button, .toolbar select {
+      margin: 0 5px;
+      padding: 8px 20px;
+    
+    }
+    .toolbar2 button, .toolbar2 select {
+      margin: 0 5px;
+      padding: 8px 20px;
+    
+    }
+    .toolbar1 button, .toolbar1 select {
       margin: 0 5px;
       padding: 8px 20px;
     
@@ -195,6 +227,10 @@
 <body>
   <svg id="graph" width="100%" height="100%"></svg>
   <div class="tooltip" id="tooltip" style="display: none;"></div>
+  <div class="toolbar1">
+    
+    <button onclick="window.location.href = 'https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/';">Home</button>
+  </div>
   <div class="toolbar">
     <button id="zoom_in" >Zoom In</button>
     <button id="zoom_out">Zoom Out</button>
@@ -222,6 +258,11 @@
       <option value="w19">Project Development</option>
       <option value="FP">Final Project: Dream Sway</option>
     </select>
+  </div>
+  <div class="toolbar2">
+    
+    <!-- <button id="">About Me</button> -->
+    <button onclick="window.location.href = 'https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/#contactme';">Contact Me</button>
   </div>
   <div class="legend" id="legend">
     <div class="legend-item">
@@ -252,7 +293,7 @@
   </div>
 
   <div class="footer">
-   Created by <a href="https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/" target="_blank" style="color: #fa5353;">Rayan Abdul Gafoor</a>
+    Created by <a href="https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/" target="_blank" style="color: #fa5353;">Rayan Abdul Gafoor</a>
   </div>
 
   <script>
