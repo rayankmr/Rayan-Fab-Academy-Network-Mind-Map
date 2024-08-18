@@ -136,6 +136,32 @@
       padding: 8px 20px;
     
     }
+    /* Responsive styles using media queries */
+    @media (max-width: 768px) {
+      button, select {
+        padding: 8px 16px;
+        font-size: 12px;
+      }
+
+      .toolbar button, .toolbar select,
+      .toolbar2 button, .toolbar2 select {
+        margin: 0 3px;
+        padding: 6px 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      button, select {
+        padding: 6px 12px;
+        font-size: 10px;
+      }
+
+      .toolbar button, .toolbar select,
+      .toolbar2 button, .toolbar2 select {
+        margin: 0 2px;
+        padding: 5px 12px;
+      }
+    }
     
 
     .legend {
@@ -196,6 +222,7 @@
             clip-path: polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%);
             animation: rotate 5s linear infinite;
         }
+        
 
         @keyframes rotate {
             100% {
@@ -228,33 +255,25 @@
             background-color: #ffffff;
         }
     /* Stat Chart */
-    chart body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            width: 100vw;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: flex-start; /* Aligns content to the start (left) */
-            align-items: flex-end; /* Aligns content to the end (bottom) */
-        }
+    body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: flex-start; /* Aligns content to the start (left) */
+    align-items: flex-end; /* Aligns content to the end (bottom) */
+}
 
-        .chart-container {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            width: 30vw; /* Adjust the width as needed */
-            height: 30vh; /* Adjust the height as needed */
-        }
-
-        /* Optional: Set max width and height for responsiveness */
-        @media (max-width: 768px) {
-            .chart-container {
-                width: 90vw;
-                height: 60vh;
-            }
-        }
+.chart-container {
+    position: absolute;
+    bottom: 18px;
+    left: 18px;
+    width: 220px; /* Fixed width */
+    height: 220px; /* Fixed height */
+}
     /* Stat Chart */
   </style>
 </head>
@@ -332,6 +351,7 @@
   </div>
   <div class="chart-container">
     <canvas id="doughnutChart"></canvas>
+    
   </div>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
