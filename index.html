@@ -162,8 +162,8 @@
     }
     .view-counter {
             position: fixed;
-            bottom: 40px;
-            left: 40px;
+            bottom: 78px;
+            left: 78px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -227,6 +227,35 @@
             text-decoration: underline;
             background-color: #ffffff;
         }
+    /* Stat Chart */
+    chart body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: flex-start; /* Aligns content to the start (left) */
+            align-items: flex-end; /* Aligns content to the end (bottom) */
+        }
+
+        .chart-container {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            width: 30vw; /* Adjust the width as needed */
+            height: 30vh; /* Adjust the height as needed */
+        }
+
+        /* Optional: Set max width and height for responsiveness */
+        @media (max-width: 768px) {
+            .chart-container {
+                width: 90vw;
+                height: 60vh;
+            }
+        }
+    /* Stat Chart */
   </style>
 </head>
 <body>
@@ -301,7 +330,10 @@
     
     Created by <a href="https://www.linkedin.com/in/rayan313/" target="_blank" style="color: #fa5353;">Rayan Abdul Gafoor</a> © 2024. All rights reserved. 
   </div>
-
+  <div class="chart-container">
+    <canvas id="doughnutChart"></canvas>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     let nodes = [
     { id: "Rayan Abdul Gafoor", url: "https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/", targetCount: 6, radius: 12, color: "#DF0066", details: "Year: 2024 <br>Node: Kochi" },
@@ -836,6 +868,57 @@
             const viewCountElement = document.getElementById('view-count');
             viewCountElement.textContent = viewCount;
         });
+    
+
+    // Stat Chart
+    const ctx = document.getElementById('doughnutChart').getContext('2d');
+
+        const data = {
+            labels: ['WEEKLY ASSIGNMENTS', 'PROFESSIONAL HUBS', 'EXTERNAL REFERENCE', 'FAB REFERENCE'],
+            datasets: [{
+                label: 'Status',
+                data: [20, 3, 56, 21], 
+                backgroundColor: [
+                    '#2ca02c',
+                    '#FFA500',
+                    '#0098DF',
+                    '#9900ff'
+                ],
+                hoverOffset: 4
+            }]
+        };
+
+        const config = {
+            type: 'doughnut',
+            data: data,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        display: false /* Hide the legend */
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return `${tooltipItem.label}: ${tooltipItem.raw}%`;
+                            }
+                        }
+                    }
+                },
+                layout: {
+                    padding: 20
+                },
+                elements: {
+                    arc: {
+                        borderWidth: 1
+                    }
+                },
+                cutout: '65%' // Adjust the cutout value to control the thickness
+            }
+        };
+
+        const doughnutChart = new Chart(ctx, config);
   </script>
 </body>
 </html>
