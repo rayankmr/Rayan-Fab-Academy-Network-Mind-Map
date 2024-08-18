@@ -69,16 +69,19 @@
         
       } */
       .toolbar {
-      position: fixed;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: #ffffff;
-      padding: 10px;
-      border: 1px solid #ccc;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      z-index: 1000;
-    }
+        position: fixed;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #ffffff;
+        padding: 10px 20px; /* Adjust padding as needed */
+        border: 1px solid #ccc;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        width: 858px; /* Fixed width */
+        /* Optional: Add max-width for responsiveness */
+        max-width: 90vw; /* Ensures toolbar doesn't exceed viewport width */
+        }
     .toolbar1 {
       position: fixed;
       top: 10px;
@@ -280,13 +283,13 @@
 <body>
   <svg id="graph" width="100%" height="100%"></svg>
   <div class="tooltip" id="tooltip" style="display: none;"></div>
-  <div class="toolbar1">
-    
+  <!-- <div class="toolbar1">
     <button onclick="window.location.href = 'https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/';">Home</button>
-  </div>
+  </div> -->
   <div class="toolbar">
+    <button onclick="window.location.href = 'https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/';">Home</button>
     <button id="zoom_in" >Zoom In</button>
-    <button id="zoom_out">Zoom Out</button>
+    
     <select id="filter">
       <option value="all" >Show All</option>
       <option value="Main">Main Page: Rayan Abdul Gafoor</option>
@@ -311,12 +314,13 @@
       <option value="w19">Project Development</option>
       <option value="FP">Final Project: Dream Sway</option>
     </select>
-  </div>
-  <div class="toolbar2">
-    
-    <!-- <button id="">About Me</button> -->
+    <button id="zoom_out">Zoom Out</button>
     <button onclick="window.location.href = 'https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/#contact';">Contact Me</button>
   </div>
+  <!-- <button id="">About Me</button> -->
+  <!-- <div class="toolbar2">
+    <button onclick="window.location.href = 'https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/#contact';">Contact Me</button>
+  </div> -->
   <div class="legend" id="legend">
     <div class="legend-item">
       <div class="legend-color" style="background-color: #DF0066;"></div>
