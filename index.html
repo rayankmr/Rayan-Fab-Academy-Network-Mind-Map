@@ -874,24 +874,24 @@
 
     // counter wheel
     document.addEventListener('DOMContentLoaded', () => {
-            // Get the view count from localStorage
-            let viewCount = localStorage.getItem('viewCount');
+    // Get the view count from localStorage
+    let viewCount = localStorage.getItem('viewCount');
 
-            // If there's no view count yet, initialize it to 0
-            if (!viewCount) {
-                viewCount = 0;
-            }
+    // If there's no view count yet, initialize it to 285
+    if (viewCount === null) {
+        viewCount = 285;
+    } else {
+        // Increment the view count if it exists
+        viewCount = parseInt(viewCount, 10) + 1;
+    }
 
-            // Increment the view count
-            viewCount++;
+    // Update localStorage with the new view count
+    localStorage.setItem('viewCount', viewCount);
 
-            // Update localStorage with the new view count
-            localStorage.setItem('viewCount', viewCount);
-
-            // Update the view count display
-            const viewCountElement = document.getElementById('view-count');
-            viewCountElement.textContent = viewCount;
-        });
+    // Update the view count display
+    const viewCountElement = document.getElementById('view-count');
+    viewCountElement.textContent = viewCount;
+});
     
 
     // Stat Chart
