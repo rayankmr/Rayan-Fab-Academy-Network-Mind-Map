@@ -108,13 +108,13 @@
       z-index: 1000;
     }
     button, select {
-  background-color: #e0e0e0; /* Change to desired initial color */
-  border: none;
-  padding: 10px 20px;
-  color: #333;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.3s; /* Smooth transition for hover effect */
+      background-color: #e0e0e0; /* Change to desired initial color */
+      border: none;
+      padding: 10px 20px;
+      color: #333;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.3s; /* Smooth transition for hover effect */
   
 }
     button:hover{
@@ -155,18 +155,34 @@
         padding: 6px 16px;
       }
     }
+    .mobile-select {
+    display: none; /* Hide by default */
+  
+    }
 
     @media (max-width: 600px) {
       button, select {
         padding: 6px 12px;
-        font-size: 10px;
+        /* font-size: 10px; */
       }
 
       .toolbar button, .toolbar select,
       .toolbar2 button, .toolbar2 select {
-        margin: 0 2px;
+        margin: 0 9px;
         padding: 5px 12px;
       }
+      #zoom_out {
+        display: none; /* Hide the zoom out button on mobile screens */
+      }
+      #zoom_in {
+        display: none; /* Hide the zoom out button on mobile screens */
+      }
+      #contact_me {
+        display: none; /* Hide the zoom out button on mobile screens */
+      }
+      }
+  
+
     }
     
 
@@ -401,8 +417,11 @@
       <option value="w19">Project Development</option>
       <option value="FP">Final Project: Dream Sway</option>
     </select>
+    
+    
+
     <button id="zoom_out"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
-    <button onclick="window.location.href = 'https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/#contact';"><i class="fa-solid fa-message"></i></button>
+    <button id="contact_me" onclick="window.location.href = 'https://fabacademy.org/2024/labs/kochi/students/rayan-abdul/#contact';"><i class="fa-solid fa-message"></i></button>
   </div>
   <!-- <button id="">About Me</button> -->
   <!-- <div class="toolbar2">
