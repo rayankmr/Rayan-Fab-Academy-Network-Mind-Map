@@ -168,7 +168,7 @@
     }
     
 
-    .legend {
+    /* .legend {
       position: absolute;
       bottom: 40px;
       right: 20px;
@@ -189,7 +189,50 @@
       width: 20px;
       height: 20px;
       margin-right: 10px;
+    } */
+    .legend {
+    position: absolute;
+    bottom: 5%; /* Use percentage for bottom positioning */
+    right: 2%; /* Use percentage for right positioning */
+    background: rgba(255, 255, 255, 0.8);
+    padding: 1rem; /* Use rem for padding */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font: 1rem sans-serif; /* Use rem for font size */
+    max-width: 90%; /* Ensure it doesn't exceed the screen width */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Optional: add a shadow for better visibility */
+}
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem; /* Use rem for margin */
     }
+
+    .legend-color {
+        width: 1.25rem; /* Use rem for width */
+        height: 1.25rem; /* Use rem for height */
+        margin-right: 0.5rem; /* Use rem for margin */
+    }
+
+    /* Media query for smaller screens */
+    @media (max-width: 600px) {
+        .legend {
+          display: none; /* Hide the legend on mobile screens */
+        }
+
+        .legend-color {
+            width: 1rem; /* Smaller color box */
+            height: 1rem; /* Smaller color box */
+        }
+    }
+   
+
+
+
+
+    
+    
     .view-counter {
             position: fixed;
             bottom: 78px;
@@ -200,33 +243,77 @@
             font-family: 'Arial', sans-serif;
         }
 
-        .wheel {
-            width: 100px;
-            height: 100px;
-            font-family: 'DS-Digital', sans-serif;
-            border-radius: 50%;
-            background-color: #0073ffcb;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 22px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .wheel:before {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: conic-gradient(from -45deg, #ff7a06 0%, #ffac07 50%, #ffff22 100%);
-            border-radius: 50%;
-            clip-path: polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%);
-            animation: rotate 5s linear infinite;
-        }
         
+.chart-container {
+    position: absolute;
+    bottom: 2%;
+    left: 2%;
+    width: 20vw; /* Responsive width based on viewport */
+    height: 20vw; /* Responsive height based on viewport */
+    max-width: 220px; /* Prevents it from exceeding a maximum size */
+    max-height: 220px;
+    min-width: 150px; /* Ensures it doesn't shrink too much */
+    min-height: 150px;
+    display: flex; /* Enable flexbox for centering */
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally */
+}
+
+/* Optional: Add a media query for very small screens */
+@media (max-width: 600px) {
+    .chart-container {
+      display: none; /* Hide the legend on mobile screens */
+    }
+}
+
+.wheel {
+    width: 20vw; /* Responsive width based on viewport width */
+    height: 20vw; /* Responsive height based on viewport width */
+    max-width: 100px; /* Sets a maximum size for larger screens */
+    max-height: 100px;
+    min-width: 60px; /* Prevents it from getting too small */
+    min-height: 60px;
+    font-family: 'DS-Digital', sans-serif;
+    border-radius: 50%;
+    background-color: #0073ffcb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2vw; /* Scales font size with the viewport */
+    position: absolute; /* Make it absolutely positioned */
+    left: 17%; /* Center horizontally */
+    bottom: 2%; /* Center vertically */
+    transform: translate(-50%, -50%); /* Offset by its own dimensions */
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.wheel:before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: conic-gradient(from -45deg, #ff7a06 0%, #ffac07 50%, #ffff22 100%);
+    border-radius: 50%;
+    clip-path: polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%);
+    animation: rotate 5s linear infinite;
+}
+
+/* Media query for extra small screens */
+@media (max-width: 480px) {
+    .wheel {
+      display: none; /* Hide the legend on mobile screens */
+    }
+}
+
+
+
+        
+
+
+
+
 
         @keyframes rotate {
             100% {
@@ -271,13 +358,10 @@
     align-items: flex-end; /* Aligns content to the end (bottom) */
 }
 
-.chart-container {
-    position: absolute;
-    bottom: 18px;
-    left: 18px;
-    width: 220px; /* Fixed width */
-    height: 220px; /* Fixed height */
-}
+
+
+
+
     /* Stat Chart */
   </style>
 </head>
@@ -344,20 +428,29 @@
       <span>FAB REFERENCE</span>
     </div>
   </div>
-  <div class="view-counter">
-    <div class="wheel" id="wheel">
-        <span id="view-count"></span>
-    </div>
-  </div>
+  
 
   <div class="footer">
     
     Created by <a href="https://www.linkedin.com/in/rayan313/" target="_blank" style="color: #fa5353;">Rayan Abdul Gafoor</a> © 2024. All rights reserved. 
   </div>
-  <div class="chart-container">
-    <canvas id="doughnutChart"></canvas>
+
+
+ 
     
-  </div>
+
+    <div class="chart-container">
+      <canvas id="doughnutChart"></canvas>
+    </div>
+
+
+    <!-- <div class="wheel" id="wheel">
+     
+    </div> -->
+
+
+
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     let nodes = [
@@ -873,27 +966,7 @@
     });
 
 
-    // counter wheel
-    document.addEventListener('DOMContentLoaded', () => {
-    // Get the view count from localStorage
-    let viewCount = localStorage.getItem('viewCount');
-
-    // If there's no view count yet, initialize it to 285
-    if (viewCount === null) {
-        viewCount = 285;
-    } else {
-        // Increment the view count if it exists
-        viewCount = parseInt(viewCount, 10) + 1;
-    }
-
-    // Update localStorage with the new view count
-    localStorage.setItem('viewCount', viewCount);
-
-    // Update the view count display
-    const viewCountElement = document.getElementById('view-count');
-    viewCountElement.textContent = viewCount;
-});
-    
+     
 
     // Stat Chart
     const ctx = document.getElementById('doughnutChart').getContext('2d');
